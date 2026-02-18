@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Difference Finder</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .images-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 500px;
+            height: auto;
+            cursor: crosshair;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        #restart-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Find the difference between these 2 images</h1>
+
+    <div class="images-row">
+        <img src="OriginalImage.png" id="original-image" alt="Original image">
+        <!-- Clickable image -->
+        <img src="Edited.png" id="edited-image" alt="Edited image">
+    </div>
+
+    <p id="message">Click on the difference in the edited image!</p>
+
+    <button id="restart-btn">🔁 Restart (new puzzle)</button>
+
+    <!-- This file is generated automatically by RandomCircle.py -->
+    <script src="game_data.js"></script>
+
+    <script>
+        const editedImg = document.getElementById('edited-image');
+        const originalImg = document.getElementById('original-image');
+        const messageEl = document.getElementById('message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // ===== CLICK GAME LOGIC =====
+        if (typeof circleData === "undefined") {
+            messageEl.textContent = "Error: circleData not loaded. Did you run RandomCircle.py?";
+            messageEl.style.color = "red";
+        } else {
+            editedImg.addEventListener('click', function (event) {
+                const rect = editedImg.getBoundingClientRect();
+
+                // Click position relative to image (display size)
+                const clickX = event.clientX - rect.left;
+                const clickY = event.clientY - rect.top;
+
+                // Scale to original image coordinates
+                const scaleX = circleData.imgWidth / rect.width;
+                const scaleY = circleData.imgHeight / rect.height;
+
+                const imgX = clickX * scaleX;
+                const imgY = clickY * scaleY;
+
+                const dx = imgX - circleData.x;
+                const dy = imgY - circleData.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance <= circleData.r) {
+                    messageEl.textContent = "✅ Correct! You clicked inside the circle.";
+                    messageEl.style.color = "green";
+                } else {
+                    messageEl.textContent = "❌ Incorrect. Try again!";
+                    messageEl.style.color = "red";
+                }
+            });
+        }
+
+        // ===== RESTART BUTTON LOGIC =====
+        restartBtn.addEventListener('click', async () => {
+            messageEl.textContent = "⏳ Generating a new puzzle…";
+            messageEl.style.color = "black";
+            restartBtn.disabled = true;
+
+            try {
+                const res = await fetch('/restart', { method: 'POST' });
+                if (!res.ok) {
+                    throw new Error('Server error');
+                }
+
+                // Optional: you can read JSON if you want
+                await res.json();
+
+                messageEl.textContent = "✅ New puzzle generated! Reloading images…";
+
+                // Bust the browser cache so it loads the new images and new game_data.js
+                const cacheBust = Date.now();
+                editedImg.src = "Edited.png?t=" + cacheBust;
+                originalImg.src = "OriginalImage.png?t=" + cacheBust;
+
+                // Reload game_data.js by reloading the page (simplest)
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } catch (err) {
+                console.error(err);
+                messageEl.textContent = "❌ Error creating new puzzle. Check server.py console.";
+                messageEl.style.color = "red";
+            } finally {
+                restartBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

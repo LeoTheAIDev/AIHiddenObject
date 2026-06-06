@@ -2,7 +2,7 @@ from openai import OpenAI
 import base64
 
 # 🔑 Put your API key here (keep it secret, do NOT share it)
-client = OpenAI(api_key="-2zEFZqe8_jjChMQXvekO-Ymo9D0eTsT3BlbkFJMtG1IRuA559cl9e_XyO-WWYTVm6NF4HWemvLziKKZoojrxYAsRyXX7KPMZdDYhdOzQcziwhjwA")
+client = OpenAI(api_key="")
 
 prompt = (
     "Create a american cartoonish image of anything that looks like its from a story, not like fantasy more like an interesting story where many thing are happening something important shold be happening around the center, its for a spotter game and not to much happening"

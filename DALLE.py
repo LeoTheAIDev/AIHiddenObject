@@ -2,7 +2,7 @@ from openai import OpenAI
 import base64
 
 # 🔑 Put your API key here (keep it secret, do NOT share it)
-client = OpenAI(api_key="RzQrJRvxP3PHdaWofALW4-2zEFZqe8_jjChMQXvekO-Ymo9D0eTsT3BlbkFJMtG1IRuA559cl9e_XyO-WWYTVm6NF4HWemvLziKKZoojrxYAsRyXX7KPMZdDYhdOzQcziwhjwA")
+client = OpenAI(api_key="")
 
 original_path = "OriginalImage_with_circle.png"
 mask_path = "mask.png"
